@@ -1,0 +1,78 @@
+# name: meowise_app
+# description: MeoWise 物联网宠物智能喂食 APP 示例
+# publish_to: "none"
+
+# version: 0.1.0+1
+
+# environment:
+#   sdk: ">=3.0.0 <4.0.0"
+
+# dependencies:
+#   flutter:
+#     sdk: flutter
+
+#   # UI 组件库
+#   getwidget: ^4.0.0
+#   flexfold: ^0.0.1
+
+#   # 状态管理（可根据个人习惯替换为 provider / riverpod 等）
+#   flutter_bloc: ^9.0.0
+
+#   # 网络请求
+#   dio: ^5.5.0
+
+#   # 本地存储（保存 token / 用户信息）
+#   shared_preferences: ^2.3.0
+
+# dev_dependencies:
+#   flutter_test:
+#     sdk: flutter
+
+# flutter:
+#   uses-material-design: true
+
+name: meowise_app
+description: MeoWise 物联网宠物智能喂食 APP
+publish_to: "none"
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # --- UI 与 配色方案 ---
+  getwidget: ^7.0.0
+  # 用 flex_color_scheme 替代不存在的 flexfold，它是目前实现莫兰迪色最强大的库
+  flex_color_scheme: ^7.3.1 
+  # 增加动画库，确保 120fps 的转场体验
+  animations: ^2.0.11
+  # 图表库，用于进食报告折线图
+  fl_chart: ^0.68.0
+
+  # --- 状态管理与逻辑 ---
+  # flutter_bloc 建议使用稳定版 8.1.3 (9.x 尚在预览阶段)
+  flutter_bloc: ^8.1.3 
+  dio: ^5.5.0
+
+  # --- 物联网 (IoT) 与 数据库 ---
+  # 蓝牙配网必备
+  flutter_blue_plus: ^1.31.0
+  # MQTT 通讯 (对接 EMQX)
+  mqtt_client: ^10.0.0
+  # 对接 MemFire Cloud (基于 Supabase SDK)
+  supabase_flutter: ^2.5.0
+
+  # --- 本地存储 ---
+  shared_preferences: ^2.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  # 建议增加 lint 规范代码
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true

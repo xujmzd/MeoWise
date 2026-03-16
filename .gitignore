@@ -1,0 +1,44 @@
+# Python 编译文件
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# 虚拟环境
+.venv/
+env/
+venv/
+
+# IDE 配置
+.vscode/
+.idea/
+
+# 数据库文件
+*.sqlite3
+*.db
+
+# 日志文件
+*.log
+
+# Alembic 迁移缓存
+alembic/versions/*.pyc
+alembic/versions/__pycache__/
+
+# 单元测试缓存
+.coverage
+htmlcov/
+.tox/
+.pytest_cache/
+
+# 环境变量文件
+.env
+.env.*
+
+# 本地依赖缓存
+*.egg-info/
+dist/
+build/
+
+# 操作系统生成的文件
+.DS_Store
+Thumbs.db
