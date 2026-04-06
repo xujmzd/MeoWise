@@ -1,0 +1,302 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import "tailwindcss";
+
+/* ========== Safe Area Insets for Notch/Status Bar ========== */
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+}
+
+@theme {
+  --color-on-tertiary-fixed: #001e2b;
+  --color-tertiary-fixed: #c0e8ff;
+  --color-error-container: #ffdad6;
+  --color-surface: #fdf9f6;
+  --color-surface-container-highest: #e5e2df;
+  --color-surface-tint: #9b4500;
+  --color-background: #fdf9f6;
+  --color-tertiary-container: #00b2e7;
+  --color-error: #ba1a1a;
+  --color-secondary-container: #eaddd7;
+  --color-on-surface: #1c1b1a;
+  --color-primary: #9b4500;
+  --color-primary-fixed-dim: #ffb68e;
+  --color-on-surface-variant: #574237;
+  --color-secondary-fixed-dim: #d0c4be;
+  --color-tertiary: #006686;
+  --color-on-primary-fixed: #331200;
+  --color-on-primary-fixed-variant: #763300;
+  --color-surface-dim: #ddd9d6;
+  --color-surface-variant: #e5e2df;
+  --color-on-tertiary: #ffffff;
+  --color-inverse-on-surface: #f4f0ed;
+  --color-primary-container: #ff822e;
+  --color-on-error: #ffffff;
+  --color-primary-fixed: #ffdbc9;
+  --color-on-secondary-fixed-variant: #4d4541;
+  --color-inverse-primary: #ffb68e;
+  --color-on-error-container: #93000a;
+  --color-outline: #8b7265;
+  --color-on-primary-container: #632a00;
+  --color-on-secondary: #ffffff;
+  --color-surface-container: #f1edea;
+  --color-secondary-fixed: #ede0da;
+  --color-outline-variant: #dec0b2;
+  --color-tertiary-fixed-dim: #6fd2ff;
+  --color-on-secondary-container: #6a615c;
+  --color-on-primary: #ffffff;
+  --color-on-background: #1c1b1a;
+  --color-surface-container-high: #ebe7e4;
+  --color-on-tertiary-container: #004055;
+  --color-on-secondary-fixed: #201a17;
+  --color-secondary: #655d58;
+  --color-inverse-surface: #31302f;
+  --color-surface-container-low: #f7f3f0;
+  --color-surface-bright: #fdf9f6;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-tertiary-fixed-variant: #004d66;
+
+  --font-headline: "Plus Jakarta Sans", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
+}
+
+@layer utilities {
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  .meowise-glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+  .cta-gradient {
+    background: linear-gradient(135deg, #9b4500 0%, #ff822e 100%);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* Safe area padding utilities */
+  .pt-safe {
+    padding-top: var(--safe-area-top);
+  }
+  .pb-safe {
+    padding-bottom: var(--safe-area-bottom);
+  }
+  .pl-safe {
+    padding-left: var(--safe-area-left);
+  }
+  .pr-safe {
+    padding-right: var(--safe-area-right);
+  }
+  
+  /* Mobile touch feedback */
+  .touch-active:active {
+    transform: scale(0.97);
+    opacity: 0.8;
+  }
+  
+  /* Haptic feedback simulation */
+  .haptic-tap {
+    transition: transform 0.1s ease-out;
+  }
+  .haptic-tap:active {
+    transform: scale(0.95);
+  }
+  
+  /* Bottom sheet styles */
+  .bottom-sheet {
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Floating action button */
+  .fab {
+    box-shadow: 0 4px 16px rgba(155, 69, 0, 0.3);
+  }
+  .fab:active {
+    box-shadow: 0 2px 8px rgba(155, 69, 0, 0.3);
+    transform: scale(0.95);
+  }
+}
+
+/* ========== Global Mobile Styles ========== */
+html {
+  /* Prevent font scaling in landscape */
+  -webkit-text-size-adjust: 100%;
+  /* Smooth scrolling */
+  scroll-behavior: smooth;
+  /* Better touch handling */
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  min-height: 100dvh;
+  min-height: calc(100dvh - var(--safe-area-top) - var(--safe-area-bottom));
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  font-family: var(--font-body);
+  /* Prevent overscroll bounce on iOS */
+  overscroll-behavior-y: none;
+  /* Safe area padding */
+  padding-top: var(--safe-area-top);
+  padding-bottom: var(--safe-area-bottom);
+}
+
+/* Remove default button styles on mobile */
+button {
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+/* Remove default input styles on mobile */
+input, select, textarea {
+  -webkit-appearance: none;
+  appearance: none;
+  border-radius: 12px;
+}
+
+/* Better focus styles for accessibility */
+input:focus, select:focus, textarea:focus, button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Prevent text selection on interactive elements */
+button, a, .no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Smooth transitions */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent pull-to-refresh on mobile */
+body {
+  overscroll-behavior-y: contain;
+}
+
+/* Status bar height compensation */
+.status-bar-spacer {
+  height: var(--safe-area-top);
+}
+
+/* Bottom navigation safe area */
+.bottom-nav-spacer {
+  height: calc(72px + var(--safe-area-bottom));
+}
+
+/* Touch-friendly tap targets (minimum 44x44px) */
+.tap-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Prevent zoom on input focus */
+@media screen and (max-width: 768px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  input[type="url"],
+  input[type="search"],
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Mobile-specific animations */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.3s ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Pull to refresh indicator */
+.pull-to-refresh {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+}
+
+/* Skeleton loading for mobile */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

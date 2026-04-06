@@ -1,0 +1,21 @@
+{
+  "name": "喵食记 (MeoWise)",
+  "short_name": "喵食记",
+  "description": "智能宠物喂食器配套应用",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#FF8A65",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 85 C25 85 15 65 15 45 C15 25 30 15 50 15 C70 15 85 25 85 45 C85 65 75 85 50 85 Z' fill='%23FF8A65' opacity='0.15' /%3E%3Cpath d='M25 35 L20 15 L40 25 M75 35 L80 15 L60 25' fill='none' stroke='%23FF8A65' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' /%3E%3Cpath d='M35 55 Q50 68 65 55' fill='none' stroke='%23FF8A65' stroke-width='5' stroke-linecap='round' /%3E%3Ccircle cx='35' cy='42' r='4.5' fill='%23FF8A65' /%3E%3Ccircle cx='65' cy='42' r='4.5' fill='%23FF8A65' /%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M50 85 C25 85 15 65 15 45 C15 25 30 15 50 15 C70 15 85 25 85 45 C85 65 75 85 50 85 Z' fill='%23FF8A65' opacity='0.15' /%3E%3Cpath d='M25 35 L20 15 L40 25 M75 35 L80 15 L60 25' fill='none' stroke='%23FF8A65' stroke-width='6' stroke-linecap='round' stroke-linejoin='round' /%3E%3Cpath d='M35 55 Q50 68 65 55' fill='none' stroke='%23FF8A65' stroke-width='5' stroke-linecap='round' /%3E%3Ccircle cx='35' cy='42' r='4.5' fill='%23FF8A65' /%3E%3Ccircle cx='65' cy='42' r='4.5' fill='%23FF8A65' /%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}
