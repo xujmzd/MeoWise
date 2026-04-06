@@ -1,10 +1,12 @@
 # backend/main.py
+import asyncio
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
 from backend.config import settings
-from backend.database import init_db
-from backend.routers import auth, users, cats, devices, feedings, stats
+from backend.routers import auth, cats, devices, feeding_plans, stats
+from backend.services.mqtt_client import mqtt_service
+
 
 def create_app() -> FastAPI:
     app = FastAPI(title=settings.PROJECT_NAME)
@@ -20,16 +22,16 @@ def create_app() -> FastAPI:
 
     # 路由
     app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
-    app.include_router(users.router, prefix=settings.API_V1_PREFIX)
     app.include_router(cats.router, prefix=settings.API_V1_PREFIX)
     app.include_router(devices.router, prefix=settings.API_V1_PREFIX)
-    app.include_router(feedings.router, prefix=settings.API_V1_PREFIX)
+    app.include_router(feeding_plans.router, prefix=settings.API_V1_PREFIX)
+    print("feeding_plans router included")
+
     app.include_router(stats.router, prefix=settings.API_V1_PREFIX)
 
     @app.on_event("startup")
     def on_startup() -> None:
-        # 同步初始化表结构
-        init_db()
+        asyncio.create_task(mqtt_service.listen())
 
     return app
 
