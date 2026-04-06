@@ -1,44 +1,56 @@
-# Python 编译文件
+# ===========================================
+# MeoWise 项目 .gitignore
+# ===========================================
+
+# --------- Python ----------
 __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
-
-# 虚拟环境
-.venv/
-env/
-venv/
-
-# IDE 配置
-.vscode/
-.idea/
-
-# 数据库文件
-*.sqlite3
 *.db
-
-# 日志文件
+*.sqlite3
 *.log
+.venv/
+venv/
+env/
 
-# Alembic 迁移缓存
-alembic/versions/*.pyc
-alembic/versions/__pycache__/
-
-# 单元测试缓存
-.coverage
-htmlcov/
-.tox/
-.pytest_cache/
-
-# 环境变量文件
-.env
-.env.*
-
-# 本地依赖缓存
-*.egg-info/
+# --------- Node.js / Frontend ----------
+node_modules/
 dist/
-build/
-
-# 操作系统生成的文件
 .DS_Store
 Thumbs.db
+
+# --------- IDE ----------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --------- Backend ----------
+server.log
+nul
+
+# --------- Android / Capacitor ----------
+# Android 构建文件（可重新生成）
+android/app/build/
+android/app/src/main/res/
+android/.gradle/
+android/build/
+android/capacitor.config.*  # 本地配置不提交
+
+# 如果需要提交Android源码，去掉上面几行的注释
+# android/
+# android/app/src/main/assets/
+
+# --------- 环境变量 ----------
+# 不提交包含敏感信息的 .env 和 .env.production
+.env
+.env.production
+.env.local
+.env.*.local
+
+# --------- 其他 ----------
+*.egg-info/
+.coverage
+htmlcov/
+.pytest_cache/
