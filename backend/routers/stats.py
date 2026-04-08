@@ -3,10 +3,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 
-from backend import models
-from backend.database import get_db
-from backend.routers.auth import get_current_user
-from backend.services.feeding_service import get_time_range
+from database import get_db
+from routers.auth import get_current_user
+from services.feeding_service import get_time_range
+import models
 
 router = APIRouter(prefix="/stats", tags=["stats"])
 

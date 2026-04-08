@@ -2,12 +2,10 @@ from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from database import get_db
+from routers.auth import get_current_user
+import models, schemas
 
-from backend import models, schemas
-from backend.database import get_db
-from backend.routers.auth import get_current_user
-
-# 路由前缀 /cats，所有猫咪相关接口都在这里
 router = APIRouter(prefix="/cats", tags=["cats"])
 
 

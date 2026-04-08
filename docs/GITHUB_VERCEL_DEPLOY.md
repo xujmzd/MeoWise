@@ -60,8 +60,8 @@ vercel --prod
 
 | 变量名 | 值（示例）|
 |--------|----------|
-| DATABASE_URL | `postgresql://postgres:[密码]@db.[ref].supabase.co:5432/postgres` |
-| SECRET_KEY | `随机字符串（至少32位）` |
+| DATABASE_URL | `postgresql://postgres:5geCQPUQdYEDu5wT@db.ajldgyrnapgxhsomfhku.supabase.co:5432/postgres` |
+| SECRET_KEY | `随机字符串（至少32位）`rV2fV1nX5iV0bU5jA9eD7qO0dG4mY5zC |
 
 ### 2. 部署前端
 

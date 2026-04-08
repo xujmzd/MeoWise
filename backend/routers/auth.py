@@ -3,17 +3,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from sqlalchemy.orm import Session
+from config import settings
+from database import get_db
+from services.security import create_access_token, get_password_hash, verify_password
+import models, schemas
 
-from backend import models, schemas
-from backend.config import settings
-from backend.database import get_db
-from backend.services.security import (
-    create_access_token,
-    get_password_hash,
-    verify_password,
-)
-
-# 路由前缀 /auth
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 # OAuth2 认证方式，前端登录时调用 /auth/token 获取 JWT

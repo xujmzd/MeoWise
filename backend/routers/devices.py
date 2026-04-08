@@ -3,13 +3,11 @@ from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from database import get_db
+from routers.auth import get_current_user
+from services.mqtt_client import mqtt_service
+import models, schemas
 
-from backend import models, schemas
-from backend.database import get_db
-from backend.routers.auth import get_current_user
-from backend.services.mqtt_client import mqtt_service
-
-# 路由前缀 /devices，所有设备相关接口都在这里
 router = APIRouter(prefix="/devices", tags=["devices"])
 
 

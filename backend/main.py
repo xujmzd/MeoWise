@@ -1,38 +1,39 @@
 # backend/main.py
-import asyncio
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.config import settings
-from backend.routers import auth, cats, devices, feeding_plans, stats
-from backend.services.mqtt_client import mqtt_service
+from config import settings
+from database import Base, engine
+from routers import auth, cats, devices, feeding_plans, stats
+import models
 
 
 def create_app() -> FastAPI:
     app = FastAPI(title=settings.PROJECT_NAME)
 
-    # CORS 配置
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],  # 开发阶段允许所有来源
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
 
-    # 路由
     app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
     app.include_router(cats.router, prefix=settings.API_V1_PREFIX)
     app.include_router(devices.router, prefix=settings.API_V1_PREFIX)
     app.include_router(feeding_plans.router, prefix=settings.API_V1_PREFIX)
-    print("feeding_plans router included")
-
     app.include_router(stats.router, prefix=settings.API_V1_PREFIX)
 
-    @app.on_event("startup")
-    def on_startup() -> None:
-        asyncio.create_task(mqtt_service.listen())
+    Base.metadata.create_all(bind=engine)
 
     return app
 
+
+# Vercel Serverless Function 入口
 app = create_app()
+
+
+# 本地开发入口
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

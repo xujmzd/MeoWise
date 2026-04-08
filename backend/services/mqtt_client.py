@@ -2,9 +2,9 @@ import asyncio
 import json
 import ssl
 import aiomqtt
-from backend.config import settings
-from backend.database import SessionLocal
-from backend import models
+from config import settings
+from database import SessionLocal
+import models
 from datetime import datetime, timezone
 
 # 创建 SSL 上下文，用于安全连接（端口 8883）

@@ -3,10 +3,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
 
-from backend import models, schemas
-from backend.database import get_db
-from backend.routers.auth import get_current_user
-from backend.services.mqtt_client import mqtt_service
+from database import get_db
+from routers.auth import get_current_user
+from services.mqtt_client import mqtt_service
+import models, schemas
 
 router = APIRouter(prefix="/feeding_plans", tags=["feeding_plans"])
 

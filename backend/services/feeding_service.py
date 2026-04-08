@@ -3,7 +3,7 @@ from typing import Tuple
 
 from sqlalchemy.orm import Session
 
-from backend import models
+import models
 
 
 def create_feeding_plan(
