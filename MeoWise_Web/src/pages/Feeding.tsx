@@ -316,29 +316,29 @@ export default function Feeding() {
             <span className="text-secondary text-sm">投喂量</span>
             <span className="font-headline text-2xl font-bold text-primary">{manualAmount}g</span>
           </div>
-          <div className="relative h-8">
-            <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-2 bg-surface-container-high rounded-full" />
-            <div 
-              className="absolute top-1/2 -translate-y-1/2 left-0 h-2 bg-gradient-to-r from-primary to-orange-500 rounded-full"
-              style={{ width: `${((manualAmount - 5) / 45) * 100}%`, transition: 'width 0ms' }}
-            />
-            <input 
-              type="range" 
-              min="5" 
-              max="50" 
-              step="5"
-              value={manualAmount}
-              onChange={(e) => { setManualAmount(Number(e.target.value)); triggerHaptic(ImpactStyle.Light); }}
-              className="absolute top-0 left-0 w-full h-8 appearance-none cursor-pointer z-10"
-              style={{ WebkitAppearance: 'none' }}
-            />
-            <div 
-              className="absolute top-1/2 -translate-y-1/2 w-8 h-8 rounded-full cta-gradient shadow-lg flex items-center justify-center z-20 pointer-events-none"
-              style={{ left: `calc(${((manualAmount - 5) / 45) * 100}% - 16px)` }}
-            >
-              <span className="material-symbols-outlined text-white text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
+            <div className="relative h-8" style={{ touchAction: 'manipulation' }}>
+              <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 h-2 bg-surface-container-high rounded-full" />
+              <div 
+                className="absolute top-1/2 -translate-y-1/2 left-0 h-2 bg-gradient-to-r from-primary to-orange-500 rounded-full"
+                style={{ width: `${((manualAmount - 5) / 45) * 100}%`, transition: 'width 0ms' }}
+              />
+              <input 
+                type="range" 
+                min="5" 
+                max="50" 
+                step="5"
+                value={manualAmount}
+                onChange={(e) => { setManualAmount(Number(e.target.value)); triggerHaptic(ImpactStyle.Light); }}
+                className="absolute top-0 left-0 w-full h-8 appearance-none cursor-pointer z-10"
+                style={{ WebkitAppearance: 'none' }}
+              />
+              <div 
+                className="absolute top-1/2 -translate-y-1/2 w-8 h-8 rounded-full cta-gradient shadow-lg flex items-center justify-center z-20 pointer-events-none"
+                style={{ left: `calc(${((manualAmount - 5) / 45) * 100}% - 16px)` }}
+              >
+                <span className="material-symbols-outlined text-white text-lg" style={{ fontVariationSettings: "'FILL' 1" }}>pets</span>
+              </div>
             </div>
-          </div>
           <div className="flex justify-between text-xs text-secondary mt-1">
             <span>5g</span>
             <span>50g</span>
