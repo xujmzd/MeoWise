@@ -84,6 +84,7 @@ def get_activities(
     device_id: int,
     limit: int | None = None,
     activity_type: str = "all",  # 可选值: "feeding", "eating", "all"
+    cat_id: int | None = None,  # 可选，筛选特定猫咪的进食记录
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
@@ -91,6 +92,7 @@ def get_activities(
     获取最近 N 条或全部活动：
     - activity_type 可选 "feeding"（仅喂食）、"eating"（仅进食）、"all"（全部）
     - limit 可选，限制返回条数；如果不传则返回全部
+    - cat_id 可选，筛选特定猫咪的进食记录
     - 按时间倒序排列
     """
     print("feeding_plans router loaded")
@@ -114,11 +116,13 @@ def get_activities(
 
     # 获取进食记录
     if activity_type in ("eating", "all"):
-        eatings = (
+        eatings_query = (
             db.query(models.Eating)
             .filter(models.Eating.device_id == device_id, models.Eating.user_id == current_user.id)
-            .all()
         )
+        if cat_id:
+            eatings_query = eatings_query.filter(models.Eating.cat_id == cat_id)
+        eatings = eatings_query.all()
         for e in eatings:
             activities.append({
                 "type": "eating",

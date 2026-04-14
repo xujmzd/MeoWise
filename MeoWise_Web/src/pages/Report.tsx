@@ -72,8 +72,8 @@ export default function Report() {
           setReport(await res.json());
         }
         
-        // Fetch events
-        const eventsRes = await fetch(`/api/v1/feeding_plans/activities?device_id=${deviceId}&limit=10&activity_type=all`, {
+        // Fetch events - 按猫咪筛选
+        const eventsRes = await fetch(`/api/v1/feeding_plans/activities?device_id=${deviceId}&limit=10&activity_type=all&cat_id=${selectedCatId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (eventsRes.ok) {
