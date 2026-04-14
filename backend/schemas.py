@@ -203,3 +203,4 @@ class TimeSync(BaseModel):
     """时间同步响应"""
     server_time: str  # ISO 格式 UTC 时间
     timezone: str     # 时区信息
+    offset_seconds: int | None = None  # 客户端与服务器的时差（秒）

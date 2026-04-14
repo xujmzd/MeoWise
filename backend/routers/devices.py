@@ -152,15 +152,32 @@ async def manual_feed(
 @router.get("/{device_id}/sync_time", response_model=schemas.TimeSync, summary="获取服务器时间用于设备校准")
 def sync_time(
     device_id: int,
+    local_time: str | None = None,  # 客户端传入的本地时间（可选）
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
     """
     时间同步：
     - 返回服务器的当前时间（ISO 格式 UTC 时间）
+    - 可选接收客户端本地时间，用于计算时区偏移
     - 设备可以通过此接口校准本地时间，确保上传的时间戳准确
     """
-    return {
-        "server_time": datetime.now(timezone.utc).isoformat(),
+    server_utc = datetime.now(timezone.utc)
+    server_utc_iso = server_utc.isoformat()
+    
+    result = {
+        "server_time": server_utc_iso,
         "timezone": "UTC",
     }
+    
+    # 如果客户端提供了本地时间，计算时区偏移
+    if local_time:
+        try:
+            client_dt = datetime.fromisoformat(local_time.replace('Z', '+00:00'))
+            client_dt_naive = client_dt.replace(tzinfo=None)
+            offset_seconds = (server_utc.replace(tzinfo=None) - client_dt_naive).total_seconds()
+            result["offset_seconds"] = int(offset_seconds)
+        except Exception:
+            pass
+    
+    return result

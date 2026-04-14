@@ -13,12 +13,25 @@ ssl_ctx = ssl.create_default_context()
 
 def parse_dt(value):
     """
-    把 ISO 格式字符串转换成 datetime（naive datetime，不带时区）
-    用于存储到数据库的 DateTime 字段
+    把时间字符串转换成 datetime（naive datetime，不带时区）
+    支持 ISO 格式和 Unix 时间戳（秒/毫秒）
     """
     if not value:
         return None
     try:
+        # 尝试解析 Unix 时间戳（毫秒）
+        if isinstance(value, (int, float)):
+            return datetime.fromtimestamp(value)
+        
+        # 尝试解析字符串形式的 Unix 时间戳
+        if isinstance(value, str) and value.isdigit():
+            ts = int(value)
+            # 判断是秒还是毫秒
+            if ts > 1e11:  # 毫秒级别
+                return datetime.fromtimestamp(ts / 1000)
+            return datetime.fromtimestamp(ts)
+        
+        # 尝试解析 ISO 格式
         if value.endswith('Z'):
             value = value[:-1] + '+00:00'
         dt = datetime.fromisoformat(value)
