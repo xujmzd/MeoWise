@@ -14,41 +14,43 @@ export default function Report() {
   const [reportLoading, setReportLoading] = useState(false);
   const navigate = useNavigate();
 
-  // 初始化：加载猫咪和设备列表
-  useEffect(() => {
-    const initFetch = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return navigate('/login');
-      
-      try {
-        // Fetch cats
-        const catsRes = await fetch('/api/v1/cats/', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (catsRes.ok) {
-          const catsData = await catsRes.json();
-          setCats(catsData);
-          if (catsData.length > 0 && selectedCatId === null) {
-            setSelectedCatId(catsData[0].id);
-          }
-        }
+   // 初始化：加载猫咪和设备列表
+   useEffect(() => {
+     const initFetch = async () => {
+       const token = localStorage.getItem('token');
+       if (!token) return navigate('/login');
+       
+       try {
+         // Fetch cats
+         const catsRes = await fetch('/api/v1/cats/', {
+           headers: { Authorization: `Bearer ${token}` },
+         });
+         if (catsRes.ok) {
+           const catsData = await catsRes.json();
+           setCats(catsData);
+           if (catsData.length > 0 && selectedCatId === null) {
+             setSelectedCatId(catsData[0].id);
+           }
+         }
 
-        // Fetch devices
-        const devRes = await fetch('/api/v1/devices/', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (devRes.ok) {
-          const devices = await devRes.json();
-          if (devices.length > 0) {
-            setDeviceId(devices[0].id);
-          }
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    initFetch();
-  }, [navigate]);
+         // Fetch devices
+         const devRes = await fetch('/api/v1/devices/', {
+           headers: { Authorization: `Bearer ${token}` },
+         });
+         if (devRes.ok) {
+           const devices = await devRes.json();
+           if (devices.length > 0) {
+             setDeviceId(devices[0].id);
+           }
+         }
+       } catch (err) {
+         console.error(err);
+       } finally {
+         setPageLoading(false);
+       }
+     };
+     initFetch();
+   }, [navigate]);
 
   // 当 period、selectedCatId 或 deviceId 变化时，重新获取报告数据
   useEffect(() => {
