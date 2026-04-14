@@ -113,7 +113,7 @@ export default function Report() {
   const stats = report?.stats || { total_eaten_g: 0, total_sessions: 0, avg_session_duration_sec: 0 };
   const chartData = groupStats.length > 0 ? groupStats.map((stat: any) => ({
     name: stat.label,
-    amount: stat.dispensed_g || 0,
+    amount: stat.eaten_g || stat.dispensed_g || 0,
     duration: stat.avg_duration_sec ? (stat.avg_duration_sec / 60).toFixed(1) : 0,
     sessions: stat.session_count || 0,
   })) : [];
