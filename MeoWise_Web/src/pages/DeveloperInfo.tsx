@@ -227,8 +227,8 @@ export default function DeveloperInfo() {
             </div>
           ))}
         </div>
-      </section>
-
+       </section>
+ 
        <div className="pt-8 text-center">
          <p className="text-xs text-secondary">© 2026 MeoWise Team. 用心为每一只猫咪。</p>
        </div>
@@ -244,4 +244,4 @@ export default function DeveloperInfo() {
        </button>
      )}
    );
-}
+ }
