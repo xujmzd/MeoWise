@@ -14,51 +14,53 @@ BEIJING_TZ = timezone(timedelta(hours=8))
 ssl_ctx = ssl.create_default_context()
 
 
-def parse_dt(value, tz_offset: int | None = None):
+def parse_dt(value, tz_offset: int = 8 * 3600):
     """
-    把时间字符串转换成 datetime（naive datetime）
+    把时间字符串转换成 datetime（本地时间）
     
     参数:
     - value: 时间值，可以是Unix时间戳、数字字符串、或ISO格式字符串
-    - tz_offset: 时区偏移（秒），例如北京时区为 8*3600=28800
-      如果提供此参数，会将时间转换为本地时间
+    - tz_offset: 时区偏移（秒），默认 8*3600=28800（北京时间 UTC+8）
+      设备上传的时间如果是UTC时间，会自动转换为本地时间
     
-    假设设备上传的时间是本地时间（北京时区 UTC+8）
-    这样存储到数据库的时间就是本地时间，与用户当地实际时间一致
+    逻辑：
+    - 假设设备上传的是UTC时间，后端自动转换为本地时间（北京时间）存储
+    - 这样数据库存储的时间就是用户的本地时间，与实际时间一致
     """
     if not value:
         return None
     try:
+        dt = None
+        
         # 尝试解析 Unix 时间戳（毫秒）
         if isinstance(value, (int, float)):
-            # 假设时间戳是本地时间，直接返回
-            dt = datetime.fromtimestamp(value)
-            if tz_offset is not None:
-                # 如果提供了时区偏移，将其调整为本地时间
-                # 时区偏移 = 本地时间 - UTC时间，所以需要减去偏移
-                dt = dt - timedelta(seconds=tz_offset)
-            return dt
+            # 时间戳默认是UTC时间，需要转换为本地时间
+            dt = datetime.utcfromtimestamp(value)
         
         # 尝试解析字符串形式的 Unix 时间戳
-        if isinstance(value, str) and value.isdigit():
+        elif isinstance(value, str) and value.isdigit():
             ts = int(value)
             # 判断是秒还是毫秒
             if ts > 1e11:  # 毫秒级别
-                dt = datetime.fromtimestamp(ts / 1000)
+                dt = datetime.utcfromtimestamp(ts / 1000)
             else:
-                dt = datetime.fromtimestamp(ts)
-            if tz_offset is not None:
-                dt = dt - timedelta(seconds=tz_offset)
-            return dt
+                dt = datetime.utcfromtimestamp(ts)
         
         # 尝试解析 ISO 格式
-        if value.endswith('Z'):
-            value = value[:-1] + '+00:00'
-        dt = datetime.fromisoformat(value)
-        if tz_offset is not None:
-            dt = dt - timedelta(seconds=tz_offset)
-        # 去除时区信息，返回 naive datetime
-        return dt.replace(tzinfo=None)
+        else:
+            if value.endswith('Z'):
+                value = value[:-1] + '+00:00'
+            dt = datetime.fromisoformat(value)
+            if dt.tzinfo is not None:
+                # 转换为UTC时间
+                dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+        
+        # 加上时区偏移，转换为本地时间
+        if dt is not None:
+            dt = dt + timedelta(seconds=tz_offset)
+            return dt
+            
+        return None
     except Exception:
         return None
             value = value[:-1] + '+00:00'
@@ -136,7 +138,7 @@ class MqttService:
         """
         event_type = payload.get("event_type", "manual")  # manual 或 scheduled
         amount_g = float(payload.get("amount_g", 0))
-        feeding_time = parse_dt(payload.get("timestamp")) or datetime.now(timezone.utc)
+        feeding_time = parse_dt(payload.get("timestamp")) or datetime.now(BEIJING_TZ).replace(tzinfo=None)
 
         feeding = models.Feeding(
             user_id=device.user_id,
