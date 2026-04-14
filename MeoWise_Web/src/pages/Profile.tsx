@@ -243,17 +243,18 @@ export default function Profile() {
       {/* Profile Header */}
       <section className="bg-surface-container-low rounded-2xl p-5">
         <div className="flex items-center gap-5">
-          <div className="relative">
-            <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-surface-container-high bg-surface-container shadow-lg">
-              <img
-                alt="头像"
-                className="w-full h-full object-cover"
-                src={USER_AVATARS[user.avatar_id] || USER_AVATARS[0]}
-              />
-            </div>
+           <div className="relative">
+             <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-surface-container-high bg-surface-container shadow-lg">
+               <img
+                 alt="头像"
+                 className="w-full h-full object-cover"
+                 src={USER_AVATARS[user.avatar_id] || USER_AVATARS[0]}
+               />
+             </div>
+           </div>
             <button 
               onClick={() => { setIsEditingProfile(true); triggerHaptic(); }} 
-              className="absolute bottom-0 right-0 cta-gradient text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center touch-active"
+              className="absolute bottom-0 right-0 cta-gradient text-white w-7 h-7 rounded-full shadow-lg flex items-center justify-center touch-active"
             >
               <span className="material-symbols-outlined text-lg">edit</span>
             </button>
