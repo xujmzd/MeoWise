@@ -5,34 +5,62 @@ import aiomqtt
 from config import settings
 from database import SessionLocal
 import models
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+
+# 北京时区 UTC+8
+BEIJING_TZ = timezone(timedelta(hours=8))
 
 # 创建 SSL 上下文，用于安全连接（端口 8883）
 ssl_ctx = ssl.create_default_context()
 
 
-def parse_dt(value):
+def parse_dt(value, tz_offset: int | None = None):
     """
-    把时间字符串转换成 datetime（naive datetime，不带时区）
-    支持 ISO 格式和 Unix 时间戳（秒/毫秒）
+    把时间字符串转换成 datetime（naive datetime）
+    
+    参数:
+    - value: 时间值，可以是Unix时间戳、数字字符串、或ISO格式字符串
+    - tz_offset: 时区偏移（秒），例如北京时区为 8*3600=28800
+      如果提供此参数，会将时间转换为本地时间
+    
+    假设设备上传的时间是本地时间（北京时区 UTC+8）
+    这样存储到数据库的时间就是本地时间，与用户当地实际时间一致
     """
     if not value:
         return None
     try:
         # 尝试解析 Unix 时间戳（毫秒）
         if isinstance(value, (int, float)):
-            return datetime.fromtimestamp(value)
+            # 假设时间戳是本地时间，直接返回
+            dt = datetime.fromtimestamp(value)
+            if tz_offset is not None:
+                # 如果提供了时区偏移，将其调整为本地时间
+                # 时区偏移 = 本地时间 - UTC时间，所以需要减去偏移
+                dt = dt - timedelta(seconds=tz_offset)
+            return dt
         
         # 尝试解析字符串形式的 Unix 时间戳
         if isinstance(value, str) and value.isdigit():
             ts = int(value)
             # 判断是秒还是毫秒
             if ts > 1e11:  # 毫秒级别
-                return datetime.fromtimestamp(ts / 1000)
-            return datetime.fromtimestamp(ts)
+                dt = datetime.fromtimestamp(ts / 1000)
+            else:
+                dt = datetime.fromtimestamp(ts)
+            if tz_offset is not None:
+                dt = dt - timedelta(seconds=tz_offset)
+            return dt
         
         # 尝试解析 ISO 格式
         if value.endswith('Z'):
+            value = value[:-1] + '+00:00'
+        dt = datetime.fromisoformat(value)
+        if tz_offset is not None:
+            dt = dt - timedelta(seconds=tz_offset)
+        # 去除时区信息，返回 naive datetime
+        return dt.replace(tzinfo=None)
+    except Exception:
+        return None
             value = value[:-1] + '+00:00'
         dt = datetime.fromisoformat(value)
         # 转换为 naive datetime（去除时区信息），以匹配数据库的 DateTime 字段

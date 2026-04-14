@@ -201,6 +201,8 @@ class ForgotPassword(BaseModel):
 
 class TimeSync(BaseModel):
     """时间同步响应"""
-    server_time: str  # ISO 格式 UTC 时间
-    timezone: str     # 时区信息
+    server_time: str          # ISO 格式 UTC 时间
+    server_beijing_time: str  # ISO 格式北京时间
+    timezone: str             # 时区信息
+    timezone_offset: int      # 时区偏移秒数（如 28800 表示 UTC+8）
     offset_seconds: int | None = None  # 客户端与服务器的时差（秒）

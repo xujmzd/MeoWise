@@ -1,11 +1,11 @@
 from typing import List
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
 from routers.auth import get_current_user
-from services.mqtt_client import mqtt_service
+from services.mqtt_client import mqtt_service, BEIJING_TZ
 import models, schemas
 
 router = APIRouter(prefix="/devices", tags=["devices"])
@@ -158,16 +158,19 @@ def sync_time(
 ):
     """
     时间同步：
-    - 返回服务器的当前时间（ISO 格式 UTC 时间）
+    - 返回服务器的当前时间（ISO 格式 UTC 时间）和北京时间
     - 可选接收客户端本地时间，用于计算时区偏移
     - 设备可以通过此接口校准本地时间，确保上传的时间戳准确
     """
     server_utc = datetime.now(timezone.utc)
+    server_beijing = datetime.now(BEIJING_TZ)
     server_utc_iso = server_utc.isoformat()
     
     result = {
         "server_time": server_utc_iso,
+        "server_beijing_time": server_beijing.isoformat(),
         "timezone": "UTC",
+        "timezone_offset": 8 * 3600,  # 北京时区偏移秒数
     }
     
     # 如果客户端提供了本地时间，计算时区偏移
