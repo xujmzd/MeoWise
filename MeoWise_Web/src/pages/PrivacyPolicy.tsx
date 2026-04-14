@@ -1,33 +1,56 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function PrivacyPolicy() {
   const navigate = useNavigate();
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleBackToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   return (
-    <div className="px-6 py-8 max-w-3xl mx-auto">
-      <div className="flex items-center gap-4 mb-8">
-        <button 
-          onClick={() => navigate(-1)} 
-          className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors"
-        >
-          <span className="material-symbols-outlined text-secondary">arrow_back</span>
-        </button>
-        <h1 className="text-2xl font-headline font-bold text-on-surface">隐私政策</h1>
-      </div>
+    <>
+      <div className="px-6 py-8 max-w-3xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors"
+          >
+            <span className="material-symbols-outlined text-secondary">arrow_back</span>
+          </button>
+          <h1 className="text-2xl font-headline font-bold text-on-surface">隐私政策</h1>
+        </div>
 
-      <div className="bg-surface-container-low rounded-2xl p-6 md:p-8 space-y-6">
-        <p className="text-sm text-secondary">生效日期：2024年1月1日</p>
+        <div className="bg-surface-container-low rounded-2xl p-6 md:p-8 space-y-6">
+          <p className="text-sm text-secondary">生效日期：2026年1月1日</p>
 
-        <section className="space-y-4">
-          <h2 className="text-lg font-bold text-on-surface">一、引言</h2>
-          <p className="text-secondary leading-relaxed">
-            喵食记（以下简称"我们"）尊重并保护所有用户的个人隐私信息。本隐私政策适用于您通过我们的移动应用程序和网站（统称"服务"）提供的个人信息。我们承诺按照本隐私政策收集、使用、存储和分享您的信息。
-          </p>
-          <p className="text-secondary leading-relaxed">
-            使用我们的服务即表示您同意本隐私政策中描述的数据处理方式。如果您不同意本政策，请停止使用我们的服务。
-          </p>
-        </section>
+          <section className="space-y-4">
+            <h2 className="text-lg font-bold text-on-surface">一、引言</h2>
+            <p className="text-sm text-secondary">生效日期：2026年1月1日</p>
+            <p className="text-secondary leading-relaxed">
+              喵食记（以下简称"我们"）尊重并保护所有用户的个人隐私信息。本隐私政策适用于您通过我们的移动应用程序和网站（统称"服务"）提供的个人信息。我们承诺按照本隐私政策收集、使用、存储和分享您的信息。
+            </p>
+            <p className="text-secondary leading-relaxed">
+              使用我们的服务即表示您同意本隐私政策中描述的数据处理方式。如果您不同意本政策，请停止使用我们的服务。
+            </p>
+          </section>
 
         <section className="space-y-4">
           <h2 className="text-lg font-bold text-on-surface">二、我们收集的信息</h2>
@@ -128,17 +151,27 @@ export default function PrivacyPolicy() {
             如果您对本隐私政策有任何问题、意见或请求，请通过以下方式联系我们：
           </p>
           <p className="text-secondary">
-            电子邮件：privacy@meowise.com<br />
-            地址：北京市朝阳区科技园区喵食记大厦
+            电子邮件：xujmzd@gmail.com<br />
           </p>
         </section>
 
-        <div className="pt-6 border-t border-outline-variant/10">
-          <p className="text-xs text-secondary text-center">
-            © 2024 喵食记 MeoWise. 保留所有权利。
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+         <div className="pt-6 border-t border-outline-variant/10">
+           <p className="text-xs text-secondary text-center">
+             © 2026 喵食记 MeoWise. 保留所有权利。
+           </p>
+         </div>
+       </div>
+     </div>
+     
+     {/* Back to Top Button */}
+     {showBackToTop && (
+       <button 
+         onClick={handleBackToTop}
+         className="fixed bottom-[calc(88px+env(safe-area-inset-bottom,0px))] right-4 w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center shadow-lg z-50 hover:bg-primary/90 transition-all duration-200"
+       >
+         <span className="material-symbols-outlined">arrow_upward</span>
+       </button>
+     )}
+   </>
+ );
 }

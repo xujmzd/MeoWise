@@ -1,8 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function DeveloperInfo() {
   const navigate = useNavigate();
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleBackToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   const softwareTeam = [
     {
@@ -53,8 +74,8 @@ export default function DeveloperInfo() {
     { label: '项目名称', value: 'MeoWise 喵食记', icon: 'pets' },
     { label: '当前版本', value: 'v4.12.0 (Build 902)', icon: 'tag' },
     { label: '开源协议', value: 'Apache-2.0 License', icon: 'gavel' },
-    { label: '联系方式', value: 'dev@meowise.com', icon: 'mail' },
-    { label: '项目地址', value: 'github.com/meowise', icon: 'code' }
+    { label: '联系方式', value: 'xujmzd@gmail.com', icon: 'mail' },
+    { label: '更多项目', value: 'github.com/xujmzd', icon: 'code' }
   ];
 
   return (
@@ -208,9 +229,19 @@ export default function DeveloperInfo() {
         </div>
       </section>
 
-      <div className="pt-8 text-center">
-        <p className="text-xs text-secondary">© 2024 MeoWise Team. 用心为每一只猫咪。</p>
-      </div>
-    </div>
-  );
+       <div className="pt-8 text-center">
+         <p className="text-xs text-secondary">© 2026 MeoWise Team. 用心为每一只猫咪。</p>
+       </div>
+     </div>
+     
+     {/* Back to Top Button */}
+     {showBackToTop && (
+       <button 
+         onClick={handleBackToTop}
+         className="fixed bottom-[calc(88px+env(safe-area-inset-bottom,0px))] right-4 w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center shadow-lg z-50 hover:bg-primary/90 transition-all duration-200"
+       >
+         <span className="material-symbols-outlined">arrow_upward</span>
+       </button>
+     )}
+   );
 }

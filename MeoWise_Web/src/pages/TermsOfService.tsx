@@ -1,36 +1,58 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 export default function TermsOfService() {
   const navigate = useNavigate();
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const handleBackToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   return (
-    <div className="px-6 py-8 max-w-3xl mx-auto">
-      <div className="flex items-center gap-4 mb-8">
-        <button 
-          onClick={() => navigate(-1)} 
-          className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors"
-        >
-          <span className="material-symbols-outlined text-secondary">arrow_back</span>
-        </button>
-        <h1 className="text-2xl font-headline font-bold text-on-surface">服务协议</h1>
-      </div>
+    <>
+      <div className="px-6 py-8 max-w-3xl mx-auto">
+        <div className="flex items-center gap-4 mb-8">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-surface-container-high transition-colors"
+          >
+            <span className="material-symbols-outlined text-secondary">arrow_back</span>
+          </button>
+          <h1 className="text-2xl font-headline font-bold text-on-surface">服务协议</h1>
+        </div>
 
-      <div className="bg-surface-container-low rounded-2xl p-6 md:p-8 space-y-6">
-        <p className="text-sm text-secondary">生效日期：2024年1月1日</p>
+        <div className="bg-surface-container-low rounded-2xl p-6 md:p-8 space-y-6">
+          <p className="text-sm text-secondary">生效日期：2026年1月1日</p>
 
-        <section className="space-y-4">
-          <h2 className="text-lg font-bold text-on-surface">一、协议的接受与修改</h2>
-          <p className="text-secondary leading-relaxed">
-            欢迎使用喵食记（以下简称"本服务"）。本服务由喵食记团队（以下简称"我们"）提供。请您在使用本服务前仔细阅读本协议。
-          </p>
-          <p className="text-secondary leading-relaxed">
-            当您访问、注册或使用本服务时，即表示您已阅读、理解并同意接受本协议的全部条款。如果您不同意本协议的任何条款，请立即停止使用本服务。
-          </p>
-          <p className="text-secondary leading-relaxed">
-            我们保留随时修改本协议的权利，修改后的协议将在应用内公布。继续使用本服务即表示您接受修改后的协议。
-          </p>
-        </section>
+          <section className="space-y-4">
+            <h2 className="text-lg font-bold text-on-surface">一、协议的接受与修改</h2>
+            <p className="text-secondary leading-relaxed">
+              欢迎使用喵食记（以下简称"本服务"）。本服务由喵食记团队（以下简称"我们"）提供。请您在使用本服务前仔细阅读本协议。
+            </p>
+            <p className="text-secondary leading-relaxed">
+              当您访问、注册或使用本服务时，即表示您已阅读、理解并同意接受本协议的全部条款。如果您不同意本协议的任何条款，请立即停止使用本服务。
+            </p>
+            <p className="text-secondary leading-relaxed">
+              我们保留随时修改本协议的权利，修改后的协议将在应用内公布。继续使用本服务即表示您接受修改后的协议。
+            </p>
+          </section>
 
         <section className="space-y-4">
           <h2 className="text-lg font-bold text-on-surface">二、服务说明</h2>
@@ -160,18 +182,27 @@ export default function TermsOfService() {
             如您对本服务协议有任何问题或意见，请通过以下方式联系我们：
           </p>
           <p className="text-secondary">
-            电子邮件：support@meowise.com<br />
-            客服热线：400-XXX-XXXX<br />
-            地址：北京市朝阳区科技园区喵食记大厦
+            电子邮件：xujmzd@gmail.com<br />
           </p>
         </section>
 
-        <div className="pt-6 border-t border-outline-variant/10">
-          <p className="text-xs text-secondary text-center">
-            © 2024 喵食记 MeoWise. 保留所有权利。
-          </p>
-        </div>
-      </div>
-    </div>
-  );
+         <div className="pt-6 border-t border-outline-variant/10">
+           <p className="text-xs text-secondary text-center">
+             © 2026 喵食记 MeoWise. 保留所有权利。
+           </p>
+         </div>
+       </div>
+     </div>
+     
+     {/* Back to Top Button */}
+     {showBackToTop && (
+       <button 
+         onClick={handleBackToTop}
+         className="fixed bottom-[calc(88px+env(safe-area-inset-bottom,0px))] right-4 w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center shadow-lg z-50 hover:bg-primary/90 transition-all duration-200"
+       >
+         <span className="material-symbols-outlined">arrow_upward</span>
+       </button>
+     )}
+   </>
+ );
 }
