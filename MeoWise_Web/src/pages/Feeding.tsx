@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { useToast } from '../components/Toast';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
+import { formatTimeAgo as formatTimeAgoUtil } from '../utils/date';
 
 const DAYS_OF_WEEK = [
   { value: 'Mon', label: '一' },
@@ -94,8 +95,11 @@ export default function Feeding() {
   const device = devices.find(d => d.id === selectedDeviceId) || devices[0];
 
   if (loading) return (
-    <div className="flex items-center justify-center py-20">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+    <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex items-center gap-3 bg-surface-container-low px-6 py-3 rounded-full shadow-lg">
+        <span className="material-symbols-outlined animate-spin text-primary">sync</span>
+        <span className="text-sm font-medium text-on-surface">思考中...</span>
+      </div>
     </div>
   );
 
@@ -262,13 +266,7 @@ export default function Feeding() {
   const bowlStatus = device ? getBowlStatus(device.bowl_weight_g || 0) : getBowlStatus(0);
 
   const formatTimeAgo = (timestamp: string) => {
-    const diffMs = new Date().getTime() - new Date(timestamp).getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 60) return `${Math.max(1, diffMins)}分钟前`;
-    const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}小时前`;
-    const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}天前`;
+    return formatTimeAgoUtil(timestamp);
   };
 
   const formatDays = (daysStr: string) => {

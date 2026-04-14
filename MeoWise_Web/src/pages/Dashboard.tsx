@@ -5,19 +5,27 @@ import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { useToast } from '../components/Toast';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
+import { formatTimeAgo as formatTimeAgoUtil, toBeijingTime } from '../utils/date';
 
-// 格式化时间差为友好的显示文本
+// 格式化时间差为友好的显示文本（已使用北京时间）
 const formatTimeAgo = (timestamp: string): string => {
-  const diffMs = new Date().getTime() - new Date(timestamp).getTime();
+  return formatTimeAgoUtil(timestamp);
+};
+
+// 获取设备更新时间（转换为北京时间显示）
+const formatDeviceUpdateTime = (timestamp: string): string => {
+  const beijingTime = toBeijingTime(timestamp);
+  if (!beijingTime) return '从未更新';
+  const diffMs = Date.now() - beijingTime.getTime();
   const diffMins = Math.floor(diffMs / 60000);
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
   
-  if (diffMins < 1) return '刚刚';
-  if (diffMins < 60) return `${diffMins}分钟前`;
-  if (diffHours < 24) return `${diffHours}小时前`;
-  if (diffDays < 30) return `${diffDays}天前`;
-  return `${Math.floor(diffDays / 30)}个月前`;
+  if (diffMins < 1) return '刚刚更新';
+  if (diffMins < 60) return `${diffMins}分钟前更新`;
+  if (diffHours < 24) return `${diffHours}小时前更新`;
+  if (diffDays < 30) return `${diffDays}天前更新`;
+  return `${Math.floor(diffDays / 30)}个月前更新`;
 };
 
 // 触发原生触觉反馈
@@ -164,7 +172,7 @@ export default function Dashboard() {
     const token = localStorage.getItem('token');
     try {
       const url = editingCatId ? `/api/v1/cats/${editingCatId}` : '/api/v1/cats';
-      const method = editingCatId ? 'PUT' : 'POST';
+      const method = editingCatId ? 'PATCH' : 'POST';
       const res = await fetch(url, {
         method,
         headers: { 
@@ -206,8 +214,11 @@ export default function Dashboard() {
   };
 
   if (loading) return (
-    <div className="flex items-center justify-center py-20">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+    <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex items-center gap-3 bg-surface-container-low px-6 py-3 rounded-full shadow-lg">
+        <span className="material-symbols-outlined animate-spin text-primary">sync</span>
+        <span className="text-sm font-medium text-on-surface">思考中...</span>
+      </div>
     </div>
   );
 

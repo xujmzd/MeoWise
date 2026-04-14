@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { CAT_AVATARS } from '../constants/avatars';
+import { formatLocalTime } from '../utils/date';
 
 export default function Report() {
   const [report, setReport] = useState<any>(null);
@@ -90,7 +91,14 @@ export default function Report() {
 
   const selectedCat = cats.find(c => c.id === selectedCatId) || cats[0];
 
-  if (pageLoading) return <div className="p-6">Loading...</div>;
+  if (pageLoading) return (
+    <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex items-center gap-3 bg-surface-container-low px-6 py-3 rounded-full shadow-lg">
+        <span className="material-symbols-outlined animate-spin text-primary">sync</span>
+        <span className="text-sm font-medium text-on-surface">思考中...</span>
+      </div>
+    </div>
+  );
 
   if (!deviceId) {
     return (
@@ -102,6 +110,7 @@ export default function Report() {
   }
 
   const groupStats = report?.group_stats || [];
+  const stats = report?.stats || { total_eaten_g: 0, total_sessions: 0, avg_session_duration_sec: 0 };
   const chartData = groupStats.length > 0 ? groupStats.map((stat: any) => ({
     name: stat.label,
     amount: stat.dispensed_g || 0,
@@ -166,7 +175,7 @@ export default function Report() {
           </div>
           <div className="mt-8">
             <p className="text-secondary text-sm font-medium">累计进食</p>
-            <h3 className="font-headline text-4xl font-extrabold text-on-surface mt-1">{report.stats.total_eaten_g || 0}<span className="text-lg font-medium text-secondary ml-1">g</span></h3>
+            <h3 className="font-headline text-4xl font-extrabold text-on-surface mt-1">{stats.total_eaten_g || 0}<span className="text-lg font-medium text-secondary ml-1">g</span></h3>
           </div>
         </div>
 
@@ -181,7 +190,7 @@ export default function Report() {
           </div>
           <div className="mt-8">
             <p className="text-secondary text-sm font-medium">进食次数</p>
-            <h3 className="font-headline text-4xl font-extrabold text-on-surface mt-1">{report.stats.total_sessions}<span className="text-lg font-medium text-secondary ml-1">次</span></h3>
+            <h3 className="font-headline text-4xl font-extrabold text-on-surface mt-1">{stats.total_sessions || 0}<span className="text-lg font-medium text-secondary ml-1">次</span></h3>
           </div>
         </div>
 
@@ -196,7 +205,7 @@ export default function Report() {
           </div>
           <div className="mt-8">
             <p className="text-secondary text-sm font-medium">平均进食时长</p>
-            <h3 className="font-headline text-4xl font-extrabold text-on-surface mt-1">{(report.stats.avg_session_duration_sec / 60).toFixed(1)}<span className="text-lg font-medium text-secondary ml-1">分钟</span></h3>
+            <h3 className="font-headline text-4xl font-extrabold text-on-surface mt-1">{(stats.avg_session_duration_sec / 60).toFixed(1)}<span className="text-lg font-medium text-secondary ml-1">分钟</span></h3>
           </div>
         </div>
       </div>
@@ -206,7 +215,7 @@ export default function Report() {
           <div className="absolute inset-0 bg-surface-container/50 backdrop-blur-sm rounded-[1.5rem] z-10 flex items-center justify-center">
             <div className="flex items-center gap-3 bg-surface-container-low px-6 py-3 rounded-full shadow-lg">
               <span className="material-symbols-outlined animate-spin text-primary">sync</span>
-              <span className="text-sm font-medium text-on-surface">加载中...</span>
+              <span className="text-sm font-medium text-on-surface">思考中...</span>
             </div>
           </div>
         )}
@@ -320,7 +329,7 @@ export default function Report() {
                   </div>
                   <div>
                     <p className="font-semibold text-on-surface">{event.type === 'feeding' ? '喂食已完成' : '宠物进食'}</p>
-                    <p className="text-xs text-secondary">{new Date(event.time).toLocaleString()}</p>
+                    <p className="text-xs text-secondary">{formatLocalTime(event.time)}</p>
                   </div>
                 </div>
                 <div className="text-right">

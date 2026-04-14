@@ -5,6 +5,7 @@ import { Capacitor } from '@capacitor/core';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { useToast } from '../components/Toast';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
+import { formatTimeAgo as formatTimeAgoUtil } from '../utils/date';
 
 // 触发原生触觉反馈
 const triggerHaptic = async (style: ImpactStyle = ImpactStyle.Medium) => {
@@ -39,6 +40,12 @@ export default function Profile() {
   const [wifiPassword, setWifiPassword] = useState('');
   const [pairingStatus, setPairingStatus] = useState('');
   const [pairedDevice, setPairedDevice] = useState<any>(null);
+  
+  // Bluetooth states
+  const [bluetoothDevices, setBluetoothDevices] = useState<any[]>([]);
+  const [isScanningBluetooth, setIsScanningBluetooth] = useState(false);
+  const [connectedDevice, setConnectedDevice] = useState<any>(null);
+  const [bluetoothStatus, setBluetoothStatus] = useState('');
 
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -52,21 +59,9 @@ export default function Profile() {
     onRefresh: handleRefresh,
   });
 
-  // 格式化更新时间
+  // 格式化更新时间（使用北京时间）
   const formatUpdateTime = (dateString: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-    
-    if (diffMins < 1) return '刚刚';
-    if (diffMins < 60) return `${diffMins} 分钟前`;
-    if (diffHours < 24) return `${diffHours} 小时前`;
-    if (diffDays < 30) return `${diffDays} 天前`;
-    return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+    return formatTimeAgoUtil(dateString);
   };
 
   const fetchUserAndDevices = async () => {
@@ -176,23 +171,82 @@ export default function Profile() {
     setWifiPassword('');
     setPairingStatus('');
     setPairedDevice(null);
+    setBluetoothDevices([]);
+    setIsScanningBluetooth(false);
+    setConnectedDevice(null);
+    setBluetoothStatus('');
   };
 
   const handleNextStep = () => {
     if (deviceWizardStep === 1) {
       setDeviceWizardStep(2);
     } else if (deviceWizardStep === 2) {
+      setDeviceWizardStep(3);
+    } else if (deviceWizardStep === 3) {
       handleStartPairing();
     }
   };
 
-  const handleStartPairing = async () => {
-    setDeviceWizardStep(3);
-    setPairingStatus('正在搜索设备...');
+  // Bluetooth functions
+  const startBluetoothScan = async () => {
+    if (!Capacitor.isNativePlatform()) {
+      setBluetoothStatus('请在App中使用蓝牙功能');
+      // 模拟扫描
+      setIsScanningBluetooth(true);
+      setTimeout(() => {
+        setBluetoothDevices([
+          { id: '1', name: 'MeoWise-Feeder-001' },
+          { id: '2', name: 'MeoWise-Feeder-002' },
+        ]);
+      }, 2000);
+      return;
+    }
     
-    setTimeout(() => setPairingStatus('正在连接设备...'), 1500);
-    setTimeout(() => setPairingStatus('正在配置网络...'), 3000);
-    setTimeout(() => setPairingStatus('正在验证连接...'), 4500);
+    setIsScanningBluetooth(true);
+    setBluetoothStatus('正在搜索蓝牙设备...');
+    setBluetoothDevices([]);
+    
+    // 模拟蓝牙扫描（实际需要使用 Capacitor Bluetooth 插件）
+    setTimeout(() => {
+      setBluetoothDevices([
+        { id: '1', name: 'MeoWise-Feeder-001' },
+        { id: '2', name: 'MeoWise-Feeder-002' },
+      ]);
+      setIsScanningBluetooth(false);
+      setBluetoothStatus('找到设备');
+    }, 3000);
+  };
+
+  const connectToBluetoothDevice = async (device: any) => {
+    setBluetoothStatus('正在连接...');
+    
+    // 模拟蓝牙连接
+    setTimeout(() => {
+      setConnectedDevice(device);
+      setBluetoothStatus('连接成功');
+    }, 1500);
+  };
+
+  const sendWifiConfig = async (wifiSSID: string, wifiPassword: string) => {
+    if (!connectedDevice) {
+      return false;
+    }
+    
+    // 通过蓝牙发送WiFi配置到设备
+    // 实际需要使用 Capacitor Bluetooth 插件写入特征值
+    console.log('Sending WiFi config:', wifiSSID, wifiPassword);
+    return true;
+  };
+
+  const handleStartPairing = async () => {
+    setDeviceWizardStep(4);
+    setPairingStatus('正在通过蓝牙传输WiFi配置...');
+    
+    // 通过蓝牙发送WiFi配置
+    await sendWifiConfig(wifiName, wifiPassword);
+    
+    setTimeout(() => setPairingStatus('正在连接WiFi...'), 2000);
+    setTimeout(() => setPairingStatus('正在验证连接...'), 4000);
     
     setTimeout(async () => {
       setPairingStatus('设备绑定中...');
@@ -222,14 +276,17 @@ export default function Profile() {
         }
       } catch (err) {
         setPairingStatus('配网失败，请重试');
-        setTimeout(() => setDeviceWizardStep(2), 2000);
+        setTimeout(() => setDeviceWizardStep(3), 2000);
       }
     }, 6000);
   };
 
   if (!user) return (
-    <div className="flex items-center justify-center py-20">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+    <div className="flex items-center justify-center min-h-[200px]">
+      <div className="flex items-center gap-3 bg-surface-container-low px-6 py-3 rounded-full shadow-lg">
+        <span className="material-symbols-outlined animate-spin text-primary">sync</span>
+        <span className="text-sm font-medium text-on-surface">思考中...</span>
+      </div>
     </div>
   );
 
@@ -241,25 +298,24 @@ export default function Profile() {
         </div>
       )}
       {/* Profile Header */}
-      <section className="bg-surface-container-low rounded-2xl p-5">
+<section className="bg-surface-container-low rounded-2xl p-5">
         <div className="flex items-center gap-5">
            <div className="relative">
              <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-surface-container-high bg-surface-container shadow-lg">
-               <img
-                 alt="头像"
-                 className="w-full h-full object-cover"
-                 src={USER_AVATARS[user.avatar_id] || USER_AVATARS[0]}
-               />
-             </div>
+                <img
+                  alt="头像"
+                  className="w-full h-full object-cover"
+                  src={USER_AVATARS[user.avatar_id] || USER_AVATARS[0]}
+                />
+              </div>
+              <button 
+                onClick={() => { setIsEditingProfile(true); triggerHaptic(); }} 
+                className="absolute bottom-0 right-0 cta-gradient text-white w-7 h-7 rounded-full shadow-lg flex items-center justify-center touch-active"
+              >
+                <span className="material-symbols-outlined text-lg">edit</span>
+              </button>
            </div>
-            <button 
-              onClick={() => { setIsEditingProfile(true); triggerHaptic(); }} 
-              className="absolute bottom-0 right-0 cta-gradient text-white w-7 h-7 rounded-full shadow-lg flex items-center justify-center touch-active"
-            >
-              <span className="material-symbols-outlined text-lg">edit</span>
-            </button>
-          </div>
-          <div className="flex-grow">
+           <div className="flex-grow">
             <h1 className="text-2xl font-headline font-bold text-on-background">
               {user.nickname || user.email.split('@')[0]}
             </h1>
@@ -399,7 +455,7 @@ export default function Profile() {
 
             {/* Step Indicator */}
             <div className="flex items-center justify-center gap-2 mb-6">
-              {[1, 2, 3, 4].map(step => (
+              {[1, 2, 3, 4, 5].map(step => (
                 <div key={step} className="flex items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                     step < deviceWizardStep ? 'bg-primary text-white' : 
@@ -410,7 +466,7 @@ export default function Profile() {
                       <span className="material-symbols-outlined text-sm">check</span>
                     ) : step}
                   </div>
-                  {step < 4 && (
+                  {step < 5 && (
                     <div className={`w-6 h-0.5 ${step < deviceWizardStep ? 'bg-primary' : 'bg-surface-container'}`}></div>
                   )}
                 </div>
@@ -448,8 +504,68 @@ export default function Profile() {
               </div>
             )}
 
-            {/* Step 2: WiFi Config */}
+            {/* Step 2: Bluetooth Scan */}
             {deviceWizardStep === 2 && (
+              <div className="space-y-4">
+                <p className="text-secondary text-sm">通过蓝牙连接设备</p>
+                <div className="bg-tertiary-container/30 p-4 rounded-xl flex items-start gap-3">
+                  <span className="material-symbols-outlined text-tertiary">bluetooth</span>
+                  <p className="text-sm text-on-tertiary-container">请确保设备已通电且处于配网模式</p>
+                </div>
+                
+                {!isScanningBluetooth ? (
+                  <button 
+                    onClick={startBluetoothScan}
+                    className="w-full py-4 bg-tertiary text-white font-bold rounded-xl touch-active flex items-center justify-center gap-2"
+                  >
+                    <span className="material-symbols-outlined">bluetooth_searching</span>
+                    搜索附近设备
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-center py-4">
+                      <div className="flex items-center gap-3 bg-surface-container-low px-6 py-3 rounded-full">
+                        <span className="material-symbols-outlined animate-spin text-tertiary">sync</span>
+                        <span className="text-sm font-medium">搜索中...</span>
+                      </div>
+                    </div>
+                    {bluetoothDevices.length > 0 ? (
+                      <div className="space-y-2">
+                        {bluetoothDevices.map((device: any, index: number) => (
+                          <button
+                            key={index}
+                            onClick={() => connectToBluetoothDevice(device)}
+                            className="w-full p-4 bg-surface-container-low rounded-xl flex items-center justify-between touch-active"
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="material-symbols-outlined text-tertiary">bluetooth</span>
+                              <span className="font-medium">{device.name || '未知设备'}</span>
+                            </div>
+                            <span className="text-xs text-secondary">点击连接</span>
+                          </button>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-center text-secondary text-sm py-4">未发现设备，请确保设备处于配网模式</p>
+                    )}
+                  </div>
+                )}
+                
+                {connectedDevice && (
+                  <div className="p-4 bg-success-container/30 rounded-xl flex items-center gap-3">
+                    <span className="material-symbols-outlined text-success">check_circle</span>
+                    <span className="text-sm font-medium">已连接: {connectedDevice.name}</span>
+                  </div>
+                )}
+                
+                {bluetoothStatus && !connectedDevice && (
+                  <p className="text-center text-sm text-secondary">{bluetoothStatus}</p>
+                )}
+              </div>
+            )}
+
+            {/* Step 3: WiFi Config */}
+            {deviceWizardStep === 3 && (
               <div className="space-y-4">
                 <p className="text-secondary text-sm">配置设备的网络连接</p>
                 <div className="bg-warning-container/30 p-4 rounded-xl flex items-start gap-3">
@@ -479,8 +595,8 @@ export default function Profile() {
               </div>
             )}
 
-            {/* Step 3: Connecting */}
-            {deviceWizardStep === 3 && (
+            {/* Step 4: Connecting */}
+            {deviceWizardStep === 4 && (
               <div className="space-y-6 py-8">
                 <div className="flex flex-col items-center">
                   <div className="relative">
@@ -497,8 +613,8 @@ export default function Profile() {
               </div>
             )}
 
-            {/* Step 4: Complete */}
-            {deviceWizardStep === 4 && (
+            {/* Step 5: Complete */}
+            {deviceWizardStep === 5 && (
               <div className="space-y-6 py-4">
                 <div className="flex flex-col items-center">
                   <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mb-4">
@@ -530,7 +646,7 @@ export default function Profile() {
             )}
 
             {/* Bottom Buttons */}
-            {deviceWizardStep <= 2 && (
+            {deviceWizardStep <= 3 && (
               <div className="flex gap-3 mt-6">
                 <button 
                   onClick={resetDeviceWizard}
@@ -542,11 +658,12 @@ export default function Profile() {
                   onClick={handleNextStep}
                   disabled={
                     (deviceWizardStep === 1 && !newDeviceName.trim()) ||
-                    (deviceWizardStep === 2 && (!wifiName.trim() || !wifiPassword.trim()))
+                    (deviceWizardStep === 2 && !connectedDevice) ||
+                    (deviceWizardStep === 3 && (!wifiName.trim() || !wifiPassword.trim()))
                   }
                   className="flex-1 py-4 rounded-xl font-semibold bg-primary text-white touch-active disabled:opacity-50"
                 >
-                  {deviceWizardStep === 2 ? '开始配网' : '下一步'}
+                  {deviceWizardStep === 3 ? '开始配网' : '下一步'}
                 </button>
               </div>
             )}
