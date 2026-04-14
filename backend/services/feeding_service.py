@@ -5,6 +5,9 @@ from sqlalchemy.orm import Session
 
 import models
 
+# 北京时区 UTC+8
+BEIJING_TZ = timezone(timedelta(hours=8))
+
 
 def create_feeding_plan(
     db: Session,
@@ -44,8 +47,8 @@ def get_time_range(period: str) -> Tuple[datetime, datetime]:
     
     返回 naive datetime（不带时区），以匹配数据库中的 datetime 字段
     """
-    # 使用 naive datetime 以匹配数据库中的 DateTime 字段
-    now = datetime.now(timezone.utc).replace(tzinfo=None)
+    # 使用北京时间计算时间范围
+    now = datetime.now(BEIJING_TZ).replace(tzinfo=None)
     if period == "daily":
         # 当天 00:00 到现在
         start = now.replace(hour=0, minute=0, second=0, microsecond=0)

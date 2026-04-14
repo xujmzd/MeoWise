@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 
 from database import get_db
 from routers.auth import get_current_user
-from services.mqtt_client import mqtt_service
+from services.mqtt_client import mqtt_service, BEIJING_TZ
 import models, schemas
 
 router = APIRouter(prefix="/feeding_plans", tags=["feeding_plans"])
@@ -64,7 +64,7 @@ async def manual_feed(
     feeding = models.Feeding(
         user_id=current_user.id,
         device_id=device_id,
-        feeding_time=datetime.now(timezone.utc),
+        feeding_time=datetime.now(BEIJING_TZ).replace(tzinfo=None),
         amount_g=amount_g,
         type="manual",
     )

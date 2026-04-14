@@ -128,7 +128,7 @@ async def manual_feed(
     feeding = models.Feeding(
         user_id=current_user.id,
         device_id=device_id,
-        feeding_time=datetime.now(timezone.utc),
+        feeding_time=datetime.now(BEIJING_TZ).replace(tzinfo=None),
         amount_g=amount_g,
         type="manual",
     )
