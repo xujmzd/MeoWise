@@ -147,3 +147,20 @@ async def manual_feed(
         },
     )
     return schemas.Msg(message="Feed command sent")
+
+
+@router.get("/{device_id}/sync_time", response_model=schemas.TimeSync, summary="获取服务器时间用于设备校准")
+def sync_time(
+    device_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    """
+    时间同步：
+    - 返回服务器的当前时间（ISO 格式 UTC 时间）
+    - 设备可以通过此接口校准本地时间，确保上传的时间戳准确
+    """
+    return {
+        "server_time": datetime.now(timezone.utc).isoformat(),
+        "timezone": "UTC",
+    }

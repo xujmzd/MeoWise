@@ -12,13 +12,18 @@ ssl_ctx = ssl.create_default_context()
 
 
 def parse_dt(value):
-    """把 ISO 格式字符串转换成 datetime，如果为空或格式错误则返回 None"""
+    """
+    把 ISO 格式字符串转换成 datetime（naive datetime，不带时区）
+    用于存储到数据库的 DateTime 字段
+    """
     if not value:
         return None
     try:
         if value.endswith('Z'):
             value = value[:-1] + '+00:00'
-        return datetime.fromisoformat(value)
+        dt = datetime.fromisoformat(value)
+        # 转换为 naive datetime（去除时区信息），以匹配数据库的 DateTime 字段
+        return dt.replace(tzinfo=None)
     except Exception:
         return None
 

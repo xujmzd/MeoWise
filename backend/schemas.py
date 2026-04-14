@@ -193,3 +193,13 @@ class ForgotPassword(BaseModel):
     """找回密码请求，必须同时提供邮箱和手机号"""
     email: str
     phone: str
+
+
+#
+# 时间同步
+#
+
+class TimeSync(BaseModel):
+    """时间同步响应"""
+    server_time: str  # ISO 格式 UTC 时间
+    timezone: str     # 时区信息
