@@ -116,9 +116,8 @@ def feeding_report(
             })
 
     elif period == "weekly":
-        # 周报：近 7 个自然日，按日分组，标签使用实际星期几
-        day_names = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
-        # 从最旧的一天到今天（与 get_time_range 的窗口完全一致）
+        # 周报：从当天往前共 7 个自然日，按日分组
+        # 最后一天（今天）标签为「今天」，其余标签为日期（如 7/31、8/1…）
         for offset in range(7):
             day_start = start + timedelta(days=offset)
             day_end = day_start + timedelta(days=1)
@@ -128,18 +127,25 @@ def feeding_report(
             day_feedings = [f for f in feedings if day_start <= f.feeding_time < day_end]
             day_eatings = [e for e in eatings if day_start <= e.start_time < day_end]
 
-            avg_session_duration = _r1(
-                sum((e.end_time - e.start_time).total_seconds() for e in day_eatings if e.end_time)
-                / len(day_eatings)
-                if day_eatings else 0.0
+            session_durations = [
+                (e.end_time - e.start_time).total_seconds()
+                for e in day_eatings if e.end_time
+            ]
+            avg_session_duration = (
+                _r1(sum(session_durations) / len(session_durations))
+                if session_durations else 0.0
             )
+            total_duration = _r1(sum(session_durations)) if session_durations else 0.0
+
+            label = "今天" if day_start.date() == end.date() else f"{day_start.month}/{day_start.day}"
 
             group_stats.append({
-                "label": day_names[day_start.weekday()],
+                "label": label,
                 "dispensed_g": _r1(sum(f.amount_g for f in day_feedings)),
                 "eaten_g": _r1(sum(e.eaten_g for e in day_eatings)),
                 "session_count": len(day_eatings),
                 "avg_duration_sec": avg_session_duration,
+                "total_duration_sec": total_duration,
             })
 
     elif period == "monthly":
