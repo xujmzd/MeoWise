@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from sqlalchemy import (
     Column,
     DateTime,
@@ -10,6 +10,14 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 from database import Base
+
+# 北京时区 UTC+8
+BEIJING_TZ = timezone(timedelta(hours=8))
+
+
+def _beijing_now():
+    """数据库统一使用北京时间（naive datetime，不带时区）"""
+    return datetime.now(BEIJING_TZ).replace(tzinfo=None)
 
 
 class User(Base):
@@ -74,8 +82,8 @@ class Device(Base):
     silo_remaining_pct = Column(Float, default=100)                      # 粮仓余量百分比
     signal_strength = Column(Integer, default=0)                         # 信号强度（0-100）
     
-    # 更新时间
-    updated_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))  # 更新时间
+    # 更新时间（北京时间）
+    updated_at = Column(DateTime, default=_beijing_now, onupdate=_beijing_now)
 
     # 关系映射
     owner = relationship("User", back_populates="devices")
@@ -113,7 +121,7 @@ class Feeding(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)      # 投喂用户 ID
     device_id = Column(Integer, ForeignKey("devices.id"), nullable=False)  # 投喂设备 ID
-    feeding_time = Column(DateTime, default=lambda: datetime.now(timezone.utc))               # 投喂时间
+    feeding_time = Column(DateTime, default=_beijing_now)                                     # 投喂时间（北京时间）
     amount_g = Column(Float, nullable=False)                               # 投喂克数
     type = Column(String, nullable=False)                                  # 投喂类型：manual / scheduled
 

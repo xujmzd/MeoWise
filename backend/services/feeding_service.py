@@ -42,21 +42,25 @@ def get_time_range(period: str) -> Tuple[datetime, datetime]:
     """
     计算统计时间窗口：
     - period = "daily"：当天 00:00 到现在
-    - period = "weekly"：最近 7 天
-    - period = "monthly"：最近 28 天（4周）
-    
-    返回 naive datetime（不带时区），以匹配数据库中的 datetime 字段
+    - period = "weekly"：近 7 个自然日（今天往前推 6 天到今天）
+    - period = "monthly"：近 28 个自然日（4 周，今天往前推 27 天到今天）
+
+    返回 naive datetime（不带时区），以匹配数据库中的 datetime 字段。
+    窗口统一按自然日对齐，保证总统计 stats 与分组 group_stats 口径一致。
     """
     # 使用北京时间计算时间范围
     now = datetime.now(BEIJING_TZ).replace(tzinfo=None)
+    today = now.replace(hour=0, minute=0, second=0, microsecond=0)
     if period == "daily":
         # 当天 00:00 到现在
-        start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        start = today
     elif period == "weekly":
-        start = now - timedelta(days=7)
+        # 近 7 个自然日，包含今天
+        start = today - timedelta(days=6)
     elif period == "monthly":
-        start = now - timedelta(days=28)
+        # 近 28 个自然日（4 周），包含今天
+        start = today - timedelta(days=27)
     else:
-        start = now - timedelta(days=7)
+        start = today - timedelta(days=6)
     return start, now
 

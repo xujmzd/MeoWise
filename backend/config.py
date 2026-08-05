@@ -12,9 +12,9 @@ class Settings:
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
     ALGORITHM: str = "HS256"
     DATABASE_URL: str = DATABASE_URL
-    MQTT_BROKER_HOST: str = "broker.emqx.io"
-    MQTT_BROKER_PORT: int = 1883
-    MQTT_USERNAME: str = "MQTTX1"
+    MQTT_BROKER_HOST: str = "icfc9c11.ala.cn-hangzhou.emqxsl.cn"
+    MQTT_BROKER_PORT: int = 8883
+    MQTT_USERNAME: str = "MeoWise1"
     MQTT_PASSWORD: str = "111111"
     MQTT_BASE_TOPIC: str = "meowise"
 

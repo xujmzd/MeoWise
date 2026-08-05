@@ -59,14 +59,8 @@ def parse_dt(value, tz_offset: int = 8 * 3600):
         if dt is not None:
             dt = dt + timedelta(seconds=tz_offset)
             return dt
-            
+
         return None
-    except Exception:
-        return None
-            value = value[:-1] + '+00:00'
-        dt = datetime.fromisoformat(value)
-        # 转换为 naive datetime（去除时区信息），以匹配数据库的 DateTime 字段
-        return dt.replace(tzinfo=None)
     except Exception:
         return None
 

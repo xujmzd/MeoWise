@@ -82,25 +82,24 @@ def feeding_report(
 
     # 分组统计
     group_stats = []
-    
+
     if period == "daily":
         # 日报：按小时分组（从 00:00 到当前小时）
-        current_hour = end.hour
-        for hour in range(current_hour + 1):
+        for hour in range(end.hour + 1):
             hour_start = start.replace(hour=hour, minute=0, second=0, microsecond=0)
             hour_end = hour_start + timedelta(hours=1)
             if hour_end > end:
                 hour_end = end
-            
+
             hour_feedings = [f for f in feedings if hour_start <= f.feeding_time < hour_end]
             hour_eatings = [e for e in eatings if hour_start <= e.start_time < hour_end]
-            
+
             avg_session_duration = (
                 sum((e.end_time - e.start_time).total_seconds() for e in hour_eatings if e.end_time)
                 / len(hour_eatings)
                 if hour_eatings else 0.0
             )
-            
+
             group_stats.append({
                 "label": f"{hour:02d}:00",
                 "dispensed_g": sum(f.amount_g for f in hour_feedings),
@@ -108,56 +107,52 @@ def feeding_report(
                 "session_count": len(hour_eatings),
                 "avg_duration_sec": avg_session_duration,
             })
-    
+
     elif period == "weekly":
-        # 周报：按日分组（7天）
+        # 周报：近 7 个自然日，按日分组，标签使用实际星期几
         day_names = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"]
-        current_day = start.date()
-        day_index = 0
-        
-        while current_day <= end.date() and day_index < 7:
-            day_start = datetime.combine(current_day, datetime.min.time())
+        # 从最旧的一天到今天（与 get_time_range 的窗口完全一致）
+        for offset in range(7):
+            day_start = start + timedelta(days=offset)
             day_end = day_start + timedelta(days=1)
-            
+            if day_end > end:
+                day_end = end
+
             day_feedings = [f for f in feedings if day_start <= f.feeding_time < day_end]
             day_eatings = [e for e in eatings if day_start <= e.start_time < day_end]
-            
+
             avg_session_duration = (
                 sum((e.end_time - e.start_time).total_seconds() for e in day_eatings if e.end_time)
                 / len(day_eatings)
                 if day_eatings else 0.0
             )
-            
+
             group_stats.append({
-                "label": day_names[day_index],
+                "label": day_names[day_start.weekday()],
                 "dispensed_g": sum(f.amount_g for f in day_feedings),
                 "eaten_g": sum(e.eaten_g for e in day_eatings),
                 "session_count": len(day_eatings),
                 "avg_duration_sec": avg_session_duration,
             })
-            
-            current_day += timedelta(days=1)
-            day_index += 1
-    
+
     elif period == "monthly":
-        # 月报：按周分组（4周）
-        current_date = start
+        # 月报：近 28 个自然日，按周分组（4 周）
         week_num = 1
-        
-        while current_date <= end and week_num <= 4:
-            week_end = current_date + timedelta(days=7)
+        while week_num <= 4:
+            week_start = start + timedelta(days=(week_num - 1) * 7)
+            week_end = week_start + timedelta(days=7)
             if week_end > end:
                 week_end = end
-            
-            week_feedings = [f for f in feedings if current_date <= f.feeding_time < week_end]
-            week_eatings = [e for e in eatings if current_date <= e.start_time < week_end]
-            
+
+            week_feedings = [f for f in feedings if week_start <= f.feeding_time < week_end]
+            week_eatings = [e for e in eatings if week_start <= e.start_time < week_end]
+
             avg_session_duration = (
                 sum((e.end_time - e.start_time).total_seconds() for e in week_eatings if e.end_time)
                 / len(week_eatings)
                 if week_eatings else 0.0
             )
-            
+
             group_stats.append({
                 "label": f"第{week_num}周",
                 "dispensed_g": sum(f.amount_g for f in week_feedings),
@@ -165,12 +160,13 @@ def feeding_report(
                 "session_count": len(week_eatings),
                 "avg_duration_sec": avg_session_duration,
             })
-            
-            current_date = week_end
+
             week_num += 1
 
     return {
         "stats": stats,
         "group_stats": group_stats,
         "period": period,
+        "range_start": start.isoformat(),
+        "range_end": end.isoformat(),
     }
