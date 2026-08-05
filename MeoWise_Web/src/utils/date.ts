@@ -1,23 +1,22 @@
 /**
  * 日期时间工具函数
- * 处理 UTC 时间到本地时间（北京时区 UTC+8）的转换
+ *
+ * 约定：后端数据库统一存储【北京时间】（naive datetime，无时区后缀）。
+ * 因此前端不再额外 +8h，直接解析后端返回的时间字符串即可。
+ * （目标用户时区为 UTC+8，`new Date("YYYY-MM-DDTHH:MM:SS")` 在本地显示即为北京时间）
  */
 
-// 北京时区偏移（毫秒）
-const BEIJING_OFFSET = 8 * 60 * 60 * 1000;
-
 /**
- * 将 UTC 时间转换为北京时间
- * @param utcTime - UTC 时间字符串或 Date 对象
- * @returns 北京时间的 Date 对象
+ * 解析后端返回的时间字符串为 Date 对象
+ * @param utcTime - 后端返回的时间字符串（北京时间）或 Date 对象
+ * @returns 解析后的 Date 对象
  */
 export function toBeijingTime(utcTime: string | Date | null | undefined): Date | null {
   if (!utcTime) return null;
   try {
     const date = new Date(utcTime);
     if (isNaN(date.getTime())) return null;
-    // 加上8小时偏移
-    return new Date(date.getTime() + BEIJING_OFFSET);
+    return date;
   } catch {
     return null;
   }
@@ -25,7 +24,7 @@ export function toBeijingTime(utcTime: string | Date | null | undefined): Date |
 
 /**
  * 格式化时间为本地时间字符串
- * @param utcTime - UTC 时间字符串或 Date 对象
+ * @param utcTime - 后端返回的时间字符串（北京时间）或 Date 对象
  * @returns 本地时间字符串
  */
 export function formatLocalTime(utcTime: string | Date | null | undefined): string {
@@ -42,13 +41,12 @@ export function formatLocalTime(utcTime: string | Date | null | undefined): stri
 
 /**
  * 格式化时间为友好显示（如"2小时前"）
- * @param utcTime - UTC 时间字符串或 Date 对象
+ * @param utcTime - 后端返回的时间字符串（北京时间）或 Date 对象
  * @returns 友好时间字符串
  */
 export function formatTimeAgo(utcTime: string | Date | null | undefined): string {
   if (!utcTime) return '';
   try {
-    // 先转换为北京时间
     const beijingDate = toBeijingTime(utcTime);
     if (!beijingDate) return '';
     const diffMs = Date.now() - beijingDate.getTime();

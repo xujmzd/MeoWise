@@ -110,11 +110,11 @@ export default function Report() {
   }
 
   const groupStats = report?.group_stats || [];
-  const stats = report?.stats || { total_eaten_g: 0, total_sessions: 0, avg_session_duration_sec: 0 };
+  const stats = report?.stats || { total_dispensed_g: 0, total_eaten_g: 0, total_sessions: 0, avg_session_duration_sec: 0 };
   const chartData = groupStats.length > 0 ? groupStats.map((stat: any) => ({
     name: stat.label,
-    amount: stat.eaten_g || stat.dispensed_g || 0,
-    duration: stat.avg_duration_sec ? (stat.avg_duration_sec / 60).toFixed(1) : 0,
+    amount: stat.eaten_g ?? 0,
+    duration: Number((stat.avg_duration_sec / 60).toFixed(1)) || 0,
     sessions: stat.session_count || 0,
   })) : [];
 
@@ -163,7 +163,7 @@ export default function Report() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
         <div className="bg-surface-container-lowest rounded-[1.5rem] p-6 flex flex-col justify-between shadow-[0px_20px_40px_rgba(155,69,0,0.04)]">
           <div className="flex justify-between items-start">
             <div className="p-3 bg-primary-fixed rounded-2xl">
@@ -176,6 +176,21 @@ export default function Report() {
           <div className="mt-8">
             <p className="text-secondary text-sm font-medium">累计进食</p>
             <h3 className="font-headline text-4xl font-extrabold text-on-surface mt-1">{stats.total_eaten_g || 0}<span className="text-lg font-medium text-secondary ml-1">g</span></h3>
+          </div>
+        </div>
+
+        <div className="bg-surface-container-lowest rounded-[1.5rem] p-6 flex flex-col justify-between shadow-[0px_20px_40px_rgba(155,69,0,0.04)]">
+          <div className="flex justify-between items-start">
+            <div className="p-3 bg-tertiary-fixed rounded-2xl">
+              <span className="material-symbols-outlined text-tertiary" style={{ fontVariationSettings: "'FILL' 1" }}>package_2</span>
+            </div>
+            <span className="text-xs font-bold text-secondary opacity-60">
+              {period === 'daily' ? '今日' : period === 'weekly' ? '本周' : '本月'}
+            </span>
+          </div>
+          <div className="mt-8">
+            <p className="text-secondary text-sm font-medium">设备投喂</p>
+            <h3 className="font-headline text-4xl font-extrabold text-on-surface mt-1">{stats.total_dispensed_g || 0}<span className="text-lg font-medium text-secondary ml-1">g</span></h3>
           </div>
         </div>
 
@@ -205,7 +220,7 @@ export default function Report() {
           </div>
           <div className="mt-8">
             <p className="text-secondary text-sm font-medium">平均进食时长</p>
-            <h3 className="font-headline text-4xl font-extrabold text-on-surface mt-1">{(stats.avg_session_duration_sec / 60).toFixed(1)}<span className="text-lg font-medium text-secondary ml-1">分钟</span></h3>
+            <h3 className="font-headline text-4xl font-extrabold text-on-surface mt-1">{Number((stats.avg_session_duration_sec / 60).toFixed(1))}<span className="text-lg font-medium text-secondary ml-1">分钟</span></h3>
           </div>
         </div>
       </div>
