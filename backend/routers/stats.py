@@ -11,6 +11,11 @@ import models
 router = APIRouter(prefix="/stats", tags=["stats"])
 
 
+def _r1(value: float) -> float:
+    """数量与平均值统一保留 1 位小数"""
+    return round(value, 1)
+
+
 def _get_device_for_user(
     db: Session, user: models.User, device_id: int
 ) -> models.Device:
@@ -63,13 +68,15 @@ def feeding_report(
         eatings_query = eatings_query.filter(models.Eating.cat_id == cat_id)
     eatings = eatings_query.all()
 
-    # 总统计
-    total_dispensed = sum(f.amount_g for f in feedings)  # 设备投喂总量
-    total_eaten = sum(e.eaten_g for e in eatings)  # 猫咪实际进食总量
+    # 总统计（数量与平均值统一保留 1 位小数）
+    total_dispensed = _r1(sum(f.amount_g for f in feedings))  # 设备投喂总量
+    total_eaten = _r1(sum(e.eaten_g for e in eatings))  # 猫咪实际进食总量
     total_sessions = len(eatings)
     avg_duration = (
-        sum((e.end_time - e.start_time).total_seconds() for e in eatings if e.end_time)
-        / total_sessions
+        _r1(
+            sum((e.end_time - e.start_time).total_seconds() for e in eatings if e.end_time)
+            / total_sessions
+        )
         if total_sessions > 0 else 0.0
     )
 
@@ -94,7 +101,7 @@ def feeding_report(
             hour_feedings = [f for f in feedings if hour_start <= f.feeding_time < hour_end]
             hour_eatings = [e for e in eatings if hour_start <= e.start_time < hour_end]
 
-            avg_session_duration = (
+            avg_session_duration = _r1(
                 sum((e.end_time - e.start_time).total_seconds() for e in hour_eatings if e.end_time)
                 / len(hour_eatings)
                 if hour_eatings else 0.0
@@ -102,8 +109,8 @@ def feeding_report(
 
             group_stats.append({
                 "label": f"{hour:02d}:00",
-                "dispensed_g": sum(f.amount_g for f in hour_feedings),
-                "eaten_g": sum(e.eaten_g for e in hour_eatings),
+                "dispensed_g": _r1(sum(f.amount_g for f in hour_feedings)),
+                "eaten_g": _r1(sum(e.eaten_g for e in hour_eatings)),
                 "session_count": len(hour_eatings),
                 "avg_duration_sec": avg_session_duration,
             })
@@ -121,7 +128,7 @@ def feeding_report(
             day_feedings = [f for f in feedings if day_start <= f.feeding_time < day_end]
             day_eatings = [e for e in eatings if day_start <= e.start_time < day_end]
 
-            avg_session_duration = (
+            avg_session_duration = _r1(
                 sum((e.end_time - e.start_time).total_seconds() for e in day_eatings if e.end_time)
                 / len(day_eatings)
                 if day_eatings else 0.0
@@ -129,8 +136,8 @@ def feeding_report(
 
             group_stats.append({
                 "label": day_names[day_start.weekday()],
-                "dispensed_g": sum(f.amount_g for f in day_feedings),
-                "eaten_g": sum(e.eaten_g for e in day_eatings),
+                "dispensed_g": _r1(sum(f.amount_g for f in day_feedings)),
+                "eaten_g": _r1(sum(e.eaten_g for e in day_eatings)),
                 "session_count": len(day_eatings),
                 "avg_duration_sec": avg_session_duration,
             })
@@ -147,7 +154,7 @@ def feeding_report(
             week_feedings = [f for f in feedings if week_start <= f.feeding_time < week_end]
             week_eatings = [e for e in eatings if week_start <= e.start_time < week_end]
 
-            avg_session_duration = (
+            avg_session_duration = _r1(
                 sum((e.end_time - e.start_time).total_seconds() for e in week_eatings if e.end_time)
                 / len(week_eatings)
                 if week_eatings else 0.0
@@ -155,8 +162,8 @@ def feeding_report(
 
             group_stats.append({
                 "label": f"第{week_num}周",
-                "dispensed_g": sum(f.amount_g for f in week_feedings),
-                "eaten_g": sum(e.eaten_g for e in week_eatings),
+                "dispensed_g": _r1(sum(f.amount_g for f in week_feedings)),
+                "eaten_g": _r1(sum(e.eaten_g for e in week_eatings)),
                 "session_count": len(week_eatings),
                 "avg_duration_sec": avg_session_duration,
             })
